@@ -69,3 +69,57 @@ The CPU stress test feature in this application is protected by a feature flag. 
 
 - **Feature Flag:**  
   Ensure that you understand the implications of enabling the stress test. It is recommended to leave the **STRESS_TEST_FLAG** disabled (or set to any value other than `"true"`) during normal operation.
+
+
+## Code Quality, Secrets, and Vulnerability Checks
+### Overview
+
+- **Unit Tests:** The provided `test_main.py` uses pytest and FastAPI's TestClient to validate key endpoints. The weather endpoint test uses monkeypatching to simulate external API responses.
+
+- **Linting and Security:** The instructions above let you run code linters, secret scans, and vulnerability checks to maintain code quality and security.
+
+### Unit Tests
+  Install and run pytest to run unit tests and api tests on the code:
+    ```bash
+  pip install pytest httpx
+  pytest test_main.py
+  ```
+
+### Linting and Formatting
+
+- **flake8:**  
+  Run the following command to lint the code for style and syntax issues:
+  ```bash
+  flake8 .
+  ```
+
+- **black:**
+  Verify code formatting with:
+    ```bash
+  black --check .
+  ```
+
+### Secrets Scanning
+
+- **detect-secrets:**
+  Install and run detect-secrets to scan for sensitive information in the code:
+    ```bash
+  pip install detect-secrets
+  detect-secrets scan .
+  ```
+
+### Vulnerability Scanning
+
+- **bandit:**
+  Use Bandit to check the codebase for common security issues:
+    ```bash
+  pip install bandit
+  bandit -r .
+  ```
+
+- **safety:**
+  If you maintain a requirements.txt file, you can run Safety to check for known vulnerabilities:
+    ```bash
+  pip install safety
+  safety check -r requirements.txt
+  ```
