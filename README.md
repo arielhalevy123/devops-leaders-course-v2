@@ -79,19 +79,15 @@ The CPU stress test feature in this application is protected by a feature flag. 
 - **Linting and Security:** The instructions above let you run code linters, secret scans, and vulnerability checks to maintain code quality and security.
 
 ### Unit Tests
+
+- **pytest:**
   Install and run pytest to run unit tests and api tests on the code:
-    ```bash
+  ```bash
   pip install pytest httpx
   pytest test_main.py
   ```
 
 ### Linting and Formatting
-
-- **flake8:**  
-  Run the following command to lint the code for style and syntax issues:
-  ```bash
-  flake8 .
-  ```
 
 - **black:**
   Verify code formatting with:
@@ -114,12 +110,11 @@ The CPU stress test feature in this application is protected by a feature flag. 
   Use Bandit to check the codebase for common security issues:
     ```bash
   pip install bandit
-  bandit -r .
+  bandit -r . --exclude ./venv -lll
   ```
-
-- **safety:**
-  If you maintain a requirements.txt file, you can run Safety to check for known vulnerabilities:
-    ```bash
-  pip install safety
-  safety check -r requirements.txt
+- **pip-audit**  
+  A free, open‑source tool from the Python Packaging Authority that scans your installed dependencies for known vulnerabilities.  
+  ```bash
+  pip install pip-audit
+  pip-audit -r requirements.txt
   ```
