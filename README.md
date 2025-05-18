@@ -21,7 +21,7 @@ The Project was built with the assistance of OpenAI o3-mini-high model.
 1. **Clone the repository:**
 ```bash
 git clone https://github.com/deftdot/devops-leaders-course-v2.git
-cd weather-map-dashboard
+cd devops-leaders-course-v2
 ```
 
 2. **Create a virtual environment (optional, but recommended):**
