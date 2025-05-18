@@ -48,7 +48,7 @@ http://127.0.0.1:8000
 
 ## Stress Test Configuration and Cautions
 
-The CPU stress test feature in this application is protected by a feature flag. To enable the CPU stress test functionality, set the environment variable **STRESS_TEST_FLAG** to `"true"` (case‑insensitive). If this flag is missing, empty, or set to any other value, the stress test endpoints and UI section will be disabled.
+The CPU stress test feature in this application is protected by a feature flag. To enable the CPU stress test functionality, set the environment variable **STRESS_TEST_FLAG** to `"true"` (case‑insensitive). You can do this by editing your `.env` file or by setting the variable in your shell. If this flag is missing, empty, or set to any other value, the stress test endpoints and UI section will be disabled.
 
 ### Configuration Options
 
@@ -65,7 +65,7 @@ The CPU stress test feature in this application is protected by a feature flag. 
   Running the CPU stress test can significantly load your CPU across all cores, potentially degrading system performance or causing temporary unresponsiveness. Use this feature only in a controlled test environment.
 
 - **Multiprocessing:**  
-  The application employs multiprocessing to distribute the stress across all available CPU cores. Monitor your system’s resource usage accordingly to avoid unintended impacts.
+  The application employs multiprocessing to distribute the stress across all available CPU cores. Monitor your system's resource usage accordingly to avoid unintended impacts.
 
 - **Feature Flag:**  
   Ensure that you understand the implications of enabling the stress test. It is recommended to leave the **STRESS_TEST_FLAG** disabled (or set to any value other than `"true"`) during normal operation.
