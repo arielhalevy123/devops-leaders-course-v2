@@ -7,7 +7,10 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import requests
+from dotenv import load_dotenv
 
+
+load_dotenv()
 app = FastAPI()
 
 # Mount static files (for CSS/JS)
