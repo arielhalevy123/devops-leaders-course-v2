@@ -1,0 +1,53 @@
+/* styles.css */
+
+/* Overall body styling with a gradient background */
+body {
+    background: linear-gradient(to right, #ffecd2, #fcb69f);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Container styling for a subtle white overlay with rounded corners and shadow */
+  .container {
+    background-color: rgba(255, 255, 255, 0.9);
+    margin-top: 50px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Heading styles for better prominence */
+  h1 {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  /* Custom styles for form elements */
+  .form-inline {
+    margin-bottom: 20px;
+  }
+  
+  .form-control {
+    width: 300px;
+    border-radius: 5px;
+  }
+  
+  /* Styling for weather results */
+  #weather-result {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+  }
+  
+  /* Map container styling */
+  #map {
+    height: 400px;
+    width: 100%;
+    margin-top: 20px;
+    border: 3px solid #fcb69f;
+    border-radius: 8px;
+  }
+  

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Devops Leaders IL Course - Test App</title>
+  <!-- Bootstrap CSS for styling -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Leaflet CSS for the interactive map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Custom CSS (if any) -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    /* Additional inline styling for improved UI */
+    .card-cpu {
+      margin-top: 20px;
+      padding: 20px;
+    }
+    .status-display {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .slider-value {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-5">Devops Leaders IL Course - Test App</h1>
+    
+    <!-- Weather Section -->
+    <div class="form-inline my-3">
+      <input id="location-input" type="text" class="form-control mr-2" placeholder="Enter location">
+      <button id="get-weather" class="btn btn-primary">Get Weather</button>
+    </div>
+    <div id="weather-result" class="my-3"></div>
+    
+    <!-- Map Section -->
+    <div id="map"></div>
+    
+    {% if stress_test_enabled %}
+    <!-- CPU Stress Test Section -->
+    <div class="card card-cpu">
+      <div class="card-header">
+        <h2>CPU Stress Test</h2>
+      </div>
+      <div class="card-body">
+        <p class="text-danger">Warning: This test will heavily load your CPU across all cores. Use with caution!</p>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="cpu-duration">Duration (sec):</label>
+            <input id="cpu-duration" type="number" class="form-control" min="1" value="10">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="cpu-load">Load: <span id="cpu-load-val" class="slider-value">100</span>%</label>
+            <input id="cpu-load" type="range" class="form-control-range" min="0" max="100" value="100" 
+                   oninput="document.getElementById('cpu-load-val').innerText = this.value">
+          </div>
+          <div class="form-group col-md-4 align-self-end">
+            <button id="start-cpu-stress" class="btn btn-danger btn-block">Start CPU Stress</button>
+            <button id="stop-cpu-stress" class="btn btn-secondary btn-block mt-2">Stop CPU Stress</button>
+          </div>
+        </div>
+        <div id="cpu-stress-status" class="mt-4">
+          <div class="alert alert-info">
+            <p>Time remaining: <span id="cpu-countdown" class="status-display">0</span> sec</p>
+            <p>Iterations: <span id="cpu-iterations" class="status-display">0</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+  </div>
+  
+  <!-- Dependencies: jQuery, Popper.js, Bootstrap JS, and Leaflet JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map with a default view.
+    var map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    var marker;
+    
+    // Weather button event listener.
+    document.getElementById('get-weather').addEventListener('click', function () {
+      var location = document.getElementById('location-input').value;
+      if (!location) {
+        alert("Please enter a location!");
+        return;
+      }
+      fetch(`/weather?location=${location}`)
+        .then(response => {
+          if (!response.ok) throw new Error("Weather data not found");
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('weather-result').innerHTML = `
+            <h3>Weather in ${data.location}</h3>
+            <p>Temperature: ${data.temperature}°C</p>
+            <p>Description: ${data.description}</p>
+          `;
+          var lat = data.lat, lon = data.lon;
+          map.setView([lat, lon], 10);
+          if (marker) marker.setLatLng([lat, lon]);
+          else marker = L.marker([lat, lon]).addTo(map);
+        })
+        .catch(error => {
+          document.getElementById('weather-result').innerHTML = `<p class="text-danger">${error.message}</p>`;
+        });
+    });
+    
+    // Start CPU Stress Test button event listener.
+    document.getElementById('start-cpu-stress') && document.getElementById('start-cpu-stress').addEventListener('click', function () {
+      var duration = document.getElementById('cpu-duration').value;
+      var load = parseInt(document.getElementById('cpu-load').value, 10);
+      // Display confirmation if load is above 50%.
+      if (load > 50) {
+        var confirmProceed = confirm('Warning: Setting CPU stress above 50% may heavily overload your system. Do you want to proceed?');
+        if (!confirmProceed) {
+          return;
+        }
+      }
+      fetch(`/start_cpu_stress?duration=${duration}&load=${load}`)
+        .then(response => {
+          if (!response.ok) throw new Error("Failed to start CPU stress test");
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('cpu-stress-status').innerHTML = `
+            <div class="alert alert-info">
+              <p>CPU stress test started. Please wait...</p>
+              <p>Time remaining: <span id="cpu-countdown" class="status-display">${duration}</span> sec</p>
+              <p>Iterations: <span id="cpu-iterations" class="status-display">0</span></p>
+            </div>
+          `;
+          var interval = setInterval(function () {
+            fetch(`/stress_status`)
+              .then(response => response.json())
+              .then(status => {
+                document.getElementById('cpu-countdown').innerText = status.remaining_seconds;
+                document.getElementById('cpu-iterations').innerText = status.iterations;
+                if (!status.running) {
+                  clearInterval(interval);
+                  document.getElementById('cpu-stress-status').innerHTML += `<p class="alert alert-success mt-2">CPU stress test completed.</p>`;
+                }
+              });
+          }, 1000);
+        })
+        .catch(error => {
+          document.getElementById('cpu-stress-status').innerHTML = `<p class="text-danger">${error.message}</p>`;
+        });
+    });
+    
+    // Stop CPU Stress Test button event listener.
+    document.getElementById('stop-cpu-stress') && document.getElementById('stop-cpu-stress').addEventListener('click', function () {
+      fetch('/stop_cpu_stress')
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+        })
+        .catch(error => {
+          alert("Error stopping CPU stress test: " + error.message);
+        });
+    });
+  </script>
+</body>
+</html>
